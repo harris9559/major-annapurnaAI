@@ -10,7 +10,10 @@ export default function RemedyOfDay() {
   useEffect(() => {
     const fetchRemedy = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://major-annapurnaai-n7dr.onrender.com/api";
+
         const response = await axios.get(`${API_URL}/food/remedy-of-day`);
         setRemedy(response.data);
       } catch (error) {
@@ -25,7 +28,6 @@ export default function RemedyOfDay() {
 
   return (
     <section className="py-20 bg-gradient-to-br from-ayurveda-secondary via-ayurveda-green to-ayurveda-primary relative overflow-hidden">
-      {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
       
@@ -50,6 +52,7 @@ export default function RemedyOfDay() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             </div>
+
             <div className="md:w-1/2 p-8 md:p-10">
               <h3 className="text-3xl font-bold text-ayurveda-primary mb-4">{remedy.name}</h3>
               <p className="text-ayurveda-accent mb-6 font-medium">{remedy.category}</p>
@@ -86,6 +89,7 @@ export default function RemedyOfDay() {
                   ))}
                 </div>
               </div>
+
             </div>
           </div>
         </div>
