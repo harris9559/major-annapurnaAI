@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
@@ -27,16 +26,19 @@ export default function ProfileSetup() {
     }
   }, []);
 
-  const commonDiseases = ['diabetes', 'hypertension', 'arthritis', 'asthma', 'thyroid', 'obesity', 'insomnia', 'acidity', 'constipation'];
+  const commonDiseases = [
+    'diabetes', 'hypertension', 'arthritis', 'asthma',
+    'thyroid', 'obesity', 'insomnia', 'acidity', 'constipation'
+  ];
 
   const handleAddDisease = (disease) => {
     if (!formData.diseases.includes(disease)) {
-      setFormData({...formData, diseases: [...formData.diseases, disease]});
+      setFormData({ ...formData, diseases: [...formData.diseases, disease] });
     }
   };
 
   const handleRemoveDisease = (disease) => {
-    setFormData({...formData, diseases: formData.diseases.filter(d => d !== disease)});
+    setFormData({ ...formData, diseases: formData.diseases.filter(d => d !== disease) });
   };
 
   const handleSubmit = async (e) => {
@@ -46,15 +48,15 @@ export default function ProfileSetup() {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) return;
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-      if (token) {
-        await axios.put(
-          `${API_URL}/user/profile`,
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+      // 🔥 FIXED API URL HERE
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
+
+      await axios.put(
+        `${API_URL}/user/profile`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       router.push('/dashboard');
     } catch (error) {
@@ -93,7 +95,7 @@ export default function ProfileSetup() {
                     required
                     className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary"
                     value={formData.height}
-                    onChange={(e) => setFormData({...formData, height: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                   />
                 </div>
               </div>
@@ -109,7 +111,7 @@ export default function ProfileSetup() {
                     required
                     className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary"
                     value={formData.weight}
-                    onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                   />
                 </div>
               </div>
@@ -122,7 +124,7 @@ export default function ProfileSetup() {
               <select
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary"
                 value={formData.activityLevel}
-                onChange={(e) => setFormData({...formData, activityLevel: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })}
               >
                 <option value="sedentary">Sedentary (little to no exercise)</option>
                 <option value="light">Light (1-3 days/week)</option>
