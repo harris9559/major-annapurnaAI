@@ -26,7 +26,6 @@ export default function Dashboard() {
         router.push('/login');
         return;
       }
-
       fetchUserData();
       fetchHealthStats();
     }
@@ -34,10 +33,7 @@ export default function Dashboard() {
 
   const fetchUserData = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) return;
-
-      // 🔥 FIXED
+      const token = localStorage.getItem('token');
       const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
 
       const response = await axios.get(`${API_URL}/user/profile`, {
@@ -51,10 +47,7 @@ export default function Dashboard() {
 
   const fetchHealthStats = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) return;
-
-      // 🔥 FIXED
+      const token = localStorage.getItem('token');
       const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
 
       const response = await axios.get(`${API_URL}/health/stats`, {
@@ -69,17 +62,12 @@ export default function Dashboard() {
   const handleAddStats = async (e) => {
     e.preventDefault();
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) return;
-
-      // 🔥 FIXED
+      const token = localStorage.getItem('token');
       const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
 
-      await axios.post(
-        `${API_URL}/health/log`,
-        todayStats,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`${API_URL}/health/log`, todayStats, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       setShowModal(false);
       fetchHealthStats();
@@ -98,17 +86,6 @@ export default function Dashboard() {
     return Math.min(score, 100);
   };
 
-  if (typeof window === 'undefined') {
-    return (
-      <div className="min-h-screen bg-ayurveda-light">
-        <Navbar />
-        <div className="flex items-center justify-center h-screen">
-          <p className="text-ayurveda-primary">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!user || !stats) {
     return (
       <div className="min-h-screen bg-ayurveda-light">
@@ -120,10 +97,13 @@ export default function Dashboard() {
     );
   }
 
-  const chartData = stats.week.reverse().map((log, index) => ({
+  // =========================
+  // FIXED CHART DATA
+  // =========================
+  const chartData = (stats.week || []).slice().map((log, index) => ({
     day: `Day ${index + 1}`,
-    weight: log.weight || 0,
-    calories: log.caloriesConsumed || 0
+    weight: log?.weight ?? 0,
+    calories: log?.caloriesConsumed ?? 0,
   }));
 
   return (
@@ -136,6 +116,7 @@ export default function Dashboard() {
           <p className="text-gray-600">Track your wellness journey with Ayurvedic insights</p>
         </div>
 
+        {/* TOP CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center justify-between">
@@ -178,10 +159,41 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Rest of your dashboard stays EXACT same */}
-      </div>
+        {/* =========================== */}
+        {/* CHART SECTION (NOW WORKING) */}
+        {/* =========================== */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-ayurveda-primary">
+            Weight Trend (7 Days)
+          </h2>
 
-      {/* Modal stays same */}
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="weight" stroke="#4CAF50" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-ayurveda-primary">
+            Calorie Trend (7 Days)
+          </h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="calories" stroke="#FF5722" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }
