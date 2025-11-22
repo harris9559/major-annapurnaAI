@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
@@ -22,7 +21,9 @@ export default function Login() {
     setError('');
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      // 🔥 FIXED LINE — correct Render backend variable
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
+
       const response = await axios.post(`${API_URL}/auth/login`, formData);
 
       if (typeof window !== 'undefined') {
@@ -76,7 +77,7 @@ export default function Login() {
                     required
                     className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary focus:border-transparent"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
               </div>
@@ -92,7 +93,7 @@ export default function Login() {
                     required
                     className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary focus:border-transparent"
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   />
                 </div>
               </div>
