@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { Send, Bot, User } from 'lucide-react';
 import ReactMarkdown from "react-markdown";
-
 
 export default function Chatbot() {
   const router = useRouter();
@@ -21,9 +19,7 @@ export default function Chatbot() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-      }
+      if (!token) router.push('/login');
     }
   }, []);
 
@@ -47,7 +43,11 @@ export default function Chatbot() {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) return;
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://major-annapurnaai-n7dr.onrender.com/api";
+
       const response = await axios.post(
         `${API_URL}/chat/message`,
         { message: input },
@@ -56,10 +56,13 @@ export default function Chatbot() {
 
       const botMessage = { role: 'bot', content: response.data.message };
       setMessages(prev => [...prev, botMessage]);
+
     } catch (error) {
       console.error('Error sending message:', error);
-      const errorMessage = { role: 'bot', content: 'Sorry, I encountered an error. Please try again.' };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [
+        ...prev,
+        { role: 'bot', content: 'Sorry, I encountered an error. Please try again.' }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -85,36 +88,30 @@ export default function Chatbot() {
         <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message, index) => (
-             
-             <div
-  key={index}
-  className={`flex items-start space-x-3 ${
-    message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-  }`}
->
-  <div
-    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-      message.role === 'bot' ? 'bg-ayurveda-secondary' : 'bg-ayurveda-accent'
-    }`}
-  >
-    {message.role === 'bot' ? <Bot className="h-6 w-6 text-white" /> : <User className="h-6 w-6 text-white" />}
-  </div>
+              <div
+                key={index}
+                className={`flex items-start space-x-3 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
+              >
+                <div
+                  className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                    message.role === 'bot' ? 'bg-ayurveda-secondary' : 'bg-ayurveda-accent'
+                  }`}
+                >
+                  {message.role === 'bot' ? <Bot className="h-6 w-6 text-white" /> : <User className="h-6 w-6 text-white" />}
+                </div>
 
-  <div
-    className={`flex-1 px-4 py-3 rounded-lg ${
-      message.role === 'bot'
-        ? 'bg-ayurveda-light text-gray-800'
-        : 'bg-ayurveda-primary text-white'
-    }`}
-  >
-    <div className="whitespace-pre-wrap">
-      <ReactMarkdown>
-        {message.content}
-      </ReactMarkdown>
-    </div>
-  </div>
-</div>
-
+                <div
+                  className={`flex-1 px-4 py-3 rounded-lg ${
+                    message.role === 'bot' ? 'bg-ayurveda-light text-gray-800' : 'bg-ayurveda-primary text-white'
+                  }`}
+                >
+                  <div className="whitespace-pre-wrap">
+                    <ReactMarkdown>
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </div>
             ))}
             {loading && (
               <div className="flex items-center space-x-2 text-ayurveda-primary">
