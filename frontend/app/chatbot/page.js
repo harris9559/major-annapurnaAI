@@ -17,36 +17,28 @@ export default function Chatbot() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (!token) router.push('/login');
-    }
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) router.push("/login");
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setLoading(true);
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) return;
+      const token = localStorage.getItem("token");
 
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL ||
-        "https://major-annapurnaai-n7dr.onrender.com/api";
+      // ✅ FIXED — Always use NEXT_PUBLIC_BACKEND_URL
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + "/api";
 
       const response = await axios.post(
         `${API_URL}/chat/message`,
@@ -54,14 +46,17 @@ export default function Chatbot() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const botMessage = { role: 'bot', content: response.data.message };
-      setMessages(prev => [...prev, botMessage]);
+      const botMessage = { role: "bot", content: response.data.message };
+      setMessages((prev) => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error sending message:', error);
-      setMessages(prev => [
+      console.error("Chat Error:", error);
+      setMessages((prev) => [
         ...prev,
-        { role: 'bot', content: 'Sorry, I encountered an error. Please try again.' }
+        {
+          role: "bot",
+          content: "Sorry, I am having trouble connecting. Please try again in a moment.",
+        },
       ]);
     } finally {
       setLoading(false);
@@ -69,10 +64,10 @@ export default function Chatbot() {
   };
 
   const quickQuestions = [
-    'How to improve digestion?',
-    'Foods for immunity',
-    'Remedies for stress',
-    'Better sleep tips'
+    "How to improve digestion?",
+    "Foods for immunity",
+    "Remedies for stress",
+    "Better sleep tips",
   ];
 
   return (
@@ -81,8 +76,12 @@ export default function Chatbot() {
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 flex flex-col">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-ayurveda-primary mb-2">Ayurvedic Wellness Assistant</h1>
-          <p className="text-gray-600">Ask me about foods, herbs, remedies, and wellness practices</p>
+          <h1 className="text-3xl font-bold text-ayurveda-primary mb-2">
+            Ayurvedic Wellness Assistant
+          </h1>
+          <p className="text-gray-600">
+            Ask me about foods, herbs, remedies, and wellness practices.
+          </p>
         </div>
 
         <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
@@ -90,47 +89,57 @@ export default function Chatbot() {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex items-start space-x-3 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
+                className={`flex items-start space-x-3 ${
+                  message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
+                }`}
               >
                 <div
                   className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                    message.role === 'bot' ? 'bg-ayurveda-secondary' : 'bg-ayurveda-accent'
+                    message.role === "bot"
+                      ? "bg-ayurveda-secondary"
+                      : "bg-ayurveda-accent"
                   }`}
                 >
-                  {message.role === 'bot' ? <Bot className="h-6 w-6 text-white" /> : <User className="h-6 w-6 text-white" />}
+                  {message.role === "bot" ? (
+                    <Bot className="h-6 w-6 text-white" />
+                  ) : (
+                    <User className="h-6 w-6 text-white" />
+                  )}
                 </div>
 
                 <div
                   className={`flex-1 px-4 py-3 rounded-lg ${
-                    message.role === 'bot' ? 'bg-ayurveda-light text-gray-800' : 'bg-ayurveda-primary text-white'
+                    message.role === "bot"
+                      ? "bg-ayurveda-light text-gray-800"
+                      : "bg-ayurveda-primary text-white"
                   }`}
                 >
                   <div className="whitespace-pre-wrap">
-                    <ReactMarkdown>
-                      {message.content}
-                    </ReactMarkdown>
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 </div>
               </div>
             ))}
+
             {loading && (
               <div className="flex items-center space-x-2 text-ayurveda-primary">
                 <Bot className="h-6 w-6 animate-pulse" />
                 <span>Thinking...</span>
               </div>
             )}
+
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <div className="border-top border-gray-200 p-4 bg-gray-50">
             <div className="flex flex-wrap gap-2 mb-4">
-              {quickQuestions.map((question, index) => (
+              {quickQuestions.map((q, i) => (
                 <button
-                  key={index}
-                  onClick={() => setInput(question)}
+                  key={i}
+                  onClick={() => setInput(q)}
                   className="bg-ayurveda-beige text-ayurveda-brown px-4 py-2 rounded-full text-sm hover:bg-ayurveda-accent hover:text-white transition"
                 >
-                  {question}
+                  {q}
                 </button>
               ))}
             </div>
@@ -140,10 +149,11 @@ export default function Chatbot() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about Ayurvedic remedies, foods, or wellness..."
+                placeholder="Ask about digestion, immunity, herbs, or Ayurvedic remedies..."
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ayurveda-secondary focus:border-transparent"
                 disabled={loading}
               />
+
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
