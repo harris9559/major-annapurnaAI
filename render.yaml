@@ -4,7 +4,6 @@ services:
     name: annapurna-frontend
     env: node
     plan: free
-    region: oregon
     rootDir: frontend
     buildCommand: npm install && npm run build
     startCommand: npm start
@@ -12,17 +11,13 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_BACKEND_URL
-        fromService:
-          name: annapurna-backend
-          type: web
-          property: url
+        sync: false   # you will manually enter backend URL after deploy
 
   # ---------- BACKEND ----------
   - type: web
     name: annapurna-backend
     env: node
     plan: free
-    region: oregon
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
