@@ -1,11 +1,41 @@
 services:
+  # ---------- FRONTEND ----------
   - type: web
     name: annapurna-frontend
     env: node
-    buildCommand: npm install && cd frontend && npm install && npm run build
-    startCommand: cd frontend && npm run start
-    staticPublishPath: frontend/.next
-    routes:
-      - type: rewrite
-        source: /
-        destination: /index.html
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_BACKEND_URL
+        fromService:
+          name: annapurna-backend
+          type: web
+          property: url
+
+  # ---------- BACKEND ----------
+  - type: web
+    name: annapurna-backend
+    env: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
