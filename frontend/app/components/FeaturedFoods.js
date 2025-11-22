@@ -11,7 +11,9 @@ export default function FeaturedFoods() {
   useEffect(() => {
     const fetchFoods = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        // 🔥 FIXED API URL LINE
+        const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL + '/api';
+
         const response = await axios.get(`${API_URL}/food/featured`);
         setFoods(response.data);
       } catch (error) {
@@ -59,10 +61,8 @@ export default function FeaturedFoods() {
               alt="Boost Your Immunity with Ayurvedic Foods"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
-            {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-ayurveda-primary/90 via-ayurveda-primary/70 to-transparent"></div>
             
-            {/* Content Overlay */}
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-2xl px-8 md:px-16">
                 <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
@@ -90,7 +90,6 @@ export default function FeaturedFoods() {
               </div>
             </div>
 
-            {/* Decorative Corner Element */}
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-ayurveda-secondary/30 rounded-tl-full transform translate-x-16 translate-y-16 group-hover:scale-150 transition-transform duration-700"></div>
           </div>
         </div>
